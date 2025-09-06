@@ -1,0 +1,38 @@
+# Python
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.env
+.env
+*.egg-info/
+dist/
+build/
+
+# Odoo
+*.log
+*.db
+*.zip
+*.pot
+*.mo
+*.swp
+*.bak
+*.tmp
+*.sqlite3
+
+# VS Code
+.vscode/
+.history/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node.js (if using frontend tools)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Virtual environments
+venv/
+env/
