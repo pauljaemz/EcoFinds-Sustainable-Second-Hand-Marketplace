@@ -128,6 +128,27 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'dreamsmithtestemailid@gmail.com'
+EMAIL_HOST_PASSWORD = 'drizhvtpntccrmgs '
+
+DEFAULT_FROM_EMAIL = 'dreamsmithtestemailid@gmail.com'
+SERVER_EMAIL = DEFAULT_FROM_EMAIL # Error emails will be sent from this address
+
+# --- Frontend URL for Password Reset ---
+# This is the URL on your frontend where the user will land after clicking the email link.
+# IMPORTANT: Adjust this to your actual frontend's base URL for password reset.
+FRONTEND_PASSWORD_RESET_URL = 'http://localhost:3000/reset-password/' # Example for a React/Vue/Angular app
+
+# Optional: Ensure these are set for context in emails
+SITE_NAME = "Easy Jobs"
+#SITE_DOMAIN = "yourdomain.com" # Your actual domain
+
+AUTH_USER_MODEL = 'users.CustomUser'
+
 # Custom User Model
 RESET_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
