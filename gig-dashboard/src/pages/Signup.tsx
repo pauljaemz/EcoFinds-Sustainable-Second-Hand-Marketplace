@@ -1,45 +1,37 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../auth/AuthContext'
+import React, { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
-export default function Signup(): JSX.Element {
-  const { signup } = useAuth()
-  const nav = useNavigate()
-  const [form, setForm] = useState({ name: '', email: '', password: '' })
-  const [err, setErr] = useState('')
-  const [loading, setLoading] = useState(false)
+export default function Signup() {
+  const { signup } = useAuth();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"buyer" | "seller">("buyer");
+  const [error, setError] = useState("");
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setErr('')
-    setLoading(true)
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      await signup(form)
-      nav('/dashboard')
-    } catch (e: any) {
-      setErr(e?.message ?? 'Signup failed')
-    } finally {
-      setLoading(false)
+      signup(name, email, password, role);
+    } catch (err: any) {
+      setError(err.message);
     }
-  }
+  };
 
   return (
-    <div className="auth-page">
-      <div className="card">
-        <h2>Create account</h2>
-        <form onSubmit={onSubmit} className="form">
-          <input required placeholder="Full name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          <input required placeholder="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-          <input required placeholder="Password" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
-          {err && <div className="error">{err}</div>}
-          <button className="btn" type="submit" disabled={loading}>
-            {loading ? 'Creating…' : 'Sign up'}
-          </button>
-        </form>
-        <div className="muted">
-          Already have an account? <Link to="/login">Login</Link>
-        </div>
-      </div>
+    <div className="container">
+      <h2>Signup</h2>
+      <form onSubmit={handleSubmit}>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <input type="text" placeholder="Name" value={name} onChange={e => setName(e.target.value)} required />
+        <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
+        <select value={role} onChange={e => setRole(e.target.value as "buyer" | "seller")}>
+          <option value="buyer">Buyer</option>
+          <option value="seller">Seller</option>
+        </select>
+        <button type="submit" style={{ background: "#1abc9c", color: "white" }}>Signup</button>
+      </form>
     </div>
-  )
+  );
 }

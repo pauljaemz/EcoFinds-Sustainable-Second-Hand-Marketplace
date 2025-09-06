@@ -1,44 +1,30 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../auth/AuthContext'
+import React, { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
-export default function Login(): JSX.Element {
-  const { login } = useAuth()
-  const nav = useNavigate()
-  const [form, setForm] = useState({ email: '', password: '' })
-  const [err, setErr] = useState('')
-  const [loading, setLoading] = useState(false)
+export default function Login() {
+  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setErr('')
-    setLoading(true)
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      await login(form)
-      nav('/dashboard')
-    } catch (e: any) {
-      setErr(e?.message ?? 'Sign in failed')
-    } finally {
-      setLoading(false)
+      login(email, password);
+    } catch (err: any) {
+      setError(err.message);
     }
-  }
+  };
 
   return (
-    <div className="auth-page">
-      <div className="card">
-        <h2>Sign in</h2>
-        <form onSubmit={onSubmit} className="form">
-          <input required placeholder="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-          <input required placeholder="Password" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
-          {err && <div className="error">{err}</div>}
-          <button className="btn" type="submit" disabled={loading}>
-            {loading ? 'Signing in…' : 'Sign in'}
-          </button>
-        </form>
-        <div className="muted">
-          New here? <Link to="/signup">Create an account</Link>
-        </div>
-      </div>
+    <div className="container">
+      <h2>Login</h2>
+      <form onSubmit={handleSubmit}>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
+        <button type="submit" style={{ background: "#0070f3", color: "white" }}>Login</button>
+      </form>
     </div>
-  )
+  );
 }

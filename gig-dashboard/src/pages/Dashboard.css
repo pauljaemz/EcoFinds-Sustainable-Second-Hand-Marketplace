@@ -1,0 +1,22 @@
+.dashboard-container {
+  padding: 20px;
+}
+
+.dashboard-links {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.dashboard-links button {
+  padding: 10px 20px;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.dashboard-links button:hover {
+  background-color: #005bb5;
+}

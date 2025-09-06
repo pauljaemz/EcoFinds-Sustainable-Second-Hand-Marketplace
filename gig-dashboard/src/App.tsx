@@ -1,44 +1,45 @@
-import React from 'react'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider } from './auth/AuthContext'
-import Signup from './pages/Signup'
-import Login from './pages/Login'
-import Dashboard from './pages/Dashboard'
-import ProfileEdit from './pages/ProfileEdit'
-import ProtectedRoute from './components/ProtectedRoute'
+import React from "react";
+import { Routes, Route, Navigate, Link } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Profile from "./pages/Profile";
+import MyListings from "./pages/MyListings";
+import { useAuth } from "./context/AuthContext";
 
-export default function App(): JSX.Element {
+function App() {
+  const { user, logout } = useAuth();
+
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
+    <div>
+      <nav>
+        <div>
+          <Link to="/">Gig App</Link>
+        </div>
+        <div>
+          {user ? (
+            <>
+              <span style={{ marginRight: 10 }}>Hello, {user.name}</span>
+              <button onClick={logout} style={{ background: "#e74c3c", color: "white" }}>Logout</button>
+            </>
+          ) : (
+            <>
+              <Link to="/login"><button>Login</button></Link>
+              <Link to="/signup"><button>Signup</button></Link>
+            </>
+          )}
+        </div>
+      </nav>
 
-          {/* Dashboard is protected */}
-          <Route
-            path="/dashboard/*"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Expose profile edit as a direct route under dashboard */}
-          <Route
-            path="/dashboard/profile"
-            element={
-              <ProtectedRoute>
-                <ProfileEdit />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route path="*" element={<div style={{ padding: 20 }}>404 — not found</div>} />
-        </Routes>
-      </Router>
-    </AuthProvider>
-  )
+      <Routes>
+        <Route path="/" element={user ? <Dashboard /> : <Navigate to="/login" />} />
+        <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
+        <Route path="/signup" element={!user ? <Signup /> : <Navigate to="/" />} />
+        <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
+        <Route path="/my-listings" element={user ? <MyListings /> : <Navigate to="/login" />} />
+      </Routes>
+    </div>
+  );
 }
+
+export default App;
