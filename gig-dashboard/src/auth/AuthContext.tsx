@@ -1,14 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import type { User } from '../types.d'
+import type { User, AccountType } from '../types.d'
 
 type AuthContextType = {
   user: User | null
   token: string | null
-  signup: (payload: { name: string; email: string; password: string }) => Promise<{ token: string; user: User }>
+  signup: (payload: { name: string; email: string; password: string; accountType: AccountType }) => Promise<{ token: string; user: User }>
   login: (payload: { email: string; password: string }) => Promise<{ token: string; user: User }>
   logout: () => void
-  updateProfile: (updates: Partial<Pick<User, 'name' | 'email' | 'password'>>) => Promise<User>
+  updateProfile: (updates: Partial<Pick<User, 'name' | 'email' | 'password' | 'accountType'>>) => Promise<User>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -21,7 +21,7 @@ function delay(ms = 300) {
   return new Promise((res) => setTimeout(res, ms))
 }
 
-async function fakeSignup({ name, email, password }: { name: string; email: string; password: string }) {
+async function fakeSignup({ name, email, password, accountType }: { name: string; email: string; password: string; accountType: AccountType }) {
   await delay()
   const users: User[] = JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]')
   if (users.find((u) => u.email === email)) {
@@ -29,7 +29,7 @@ async function fakeSignup({ name, email, password }: { name: string; email: stri
     ;(e as any).code = 'EMAIL_EXISTS'
     throw e
   }
-  const user: User = { id: Date.now(), name, email, password, createdAt: new Date().toISOString() }
+  const user: User = { id: Date.now(), name, email, password, accountType, createdAt: new Date().toISOString() }
   users.push(user)
   localStorage.setItem(STORAGE_USERS, JSON.stringify(users))
   const token = btoa(JSON.stringify({ id: user.id, t: Date.now() }))
@@ -53,7 +53,7 @@ async function fakeLogin({ email, password }: { email: string; password: string 
   return { token, user }
 }
 
-async function fakeUpdateProfile(updates: Partial<Pick<User, 'name' | 'email' | 'password'>>) {
+async function fakeUpdateProfile(updates: Partial<Pick<User, 'name' | 'email' | 'password' | 'accountType'>>) {
   await delay()
   const raw = localStorage.getItem(STORAGE_USER)
   if (!raw) throw new Error('Not authenticated')
@@ -83,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('storage', onStorage)
   }, [])
 
-  async function signup(payload: { name: string; email: string; password: string }) {
+  async function signup(payload: { name: string; email: string; password: string; accountType: AccountType }) {
     const res = await fakeSignup(payload)
     setUser(res.user)
     setToken(res.token)
@@ -104,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null)
   }
 
-  async function updateProfile(updates: Partial<Pick<User, 'name' | 'email' | 'password'>>) {
+  async function updateProfile(updates: Partial<Pick<User, 'name' | 'email' | 'password' | 'accountType'>>) {
     const updated = await fakeUpdateProfile(updates)
     setUser(updated)
     return updated

@@ -51,13 +51,16 @@ export default function Dashboard(): JSX.Element {
           <div>
             <div className="name">{user?.name}</div>
             <div className="email">{user?.email}</div>
+            <div className="account-type">
+              {user?.accountType === 'seller' ? 'Seller Account' : 'Buyer Account'}
+            </div>
           </div>
         </div>
 
         <nav className="side-nav">
           <NavLink to="/dashboard">Overview</NavLink>
           <NavLink to="/dashboard/profile">Profile</NavLink>
-          <NavLink to="/dashboard/gigs">Gigs</NavLink>
+          {user?.accountType === 'seller' && <NavLink to="/dashboard/gigs">Gigs</NavLink>}
           <NavLink to="/dashboard/settings">Settings</NavLink>
         </nav>
 
