@@ -36,3 +36,6 @@ yarn-error.log
 # Virtual environments
 venv/
 env/
+
+__init__.py
+migrations/

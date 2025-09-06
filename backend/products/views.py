@@ -1,18 +1,41 @@
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import render
+from rest_framework import viewsets, permissions
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from .models import Product
 from .serializers import ProductSerializer
+
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+            return [permissions.IsAuthenticated()]
+        return [permissions.AllowAny()]
 
     def perform_create(self, serializer):
-        serializer.save()  # Additional logic can be added here if needed
+        # No role check, any authenticated user can create products
+        serializer.save(seller=self.request.user)
 
-    def perform_update(self, serializer):
-        serializer.save()  # Additional logic can be added here if needed
-
-    def perform_destroy(self, instance):
-        instance.delete()  # Additional logic can be added here if needed
+    @action(
+        detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated]
+    )
+    def by_seller(self, request):
+        """
+        List all products grouped by seller for buyers.
+        """
+        products = Product.objects.filter(is_active=True)
+        sellers = {}
+        for product in products:
+            seller_id = product.seller.id
+            seller_name = f"{product.seller.first_name} {product.seller.last_name}"
+            if seller_id not in sellers:
+                sellers[seller_id] = {
+                    "seller_id": seller_id,
+                    "seller_name": seller_name,
+                    "products": [],
+                }
+            sellers[seller_id]["products"].append(ProductSerializer(product).data)
+        return Response(list(sellers.values()))
