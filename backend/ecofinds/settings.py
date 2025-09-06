@@ -85,8 +85,8 @@ WSGI_APPLICATION = 'ecofinds.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'EcoFinds',
-        'USER': 'Naveen',
+        'NAME': 'ecofinds',
+        'USER': 'postgres',
         'PASSWORD': 'admin',
         'HOST': 'localhost',
         'PORT': '5432',

@@ -186,7 +186,7 @@ class UserRegisterViews(APIView):
                 serializer = s.SignUpSerializers(data=data)
                 if serializer.is_valid():
                     user = serializer.save()
-                    return Response({'message': 'User created successfully', 'Name': user.name}, status=status.HTTP_201_CREATED)
+                    return Response({'message': 'User created successfully', 'Name': f"{user.first_name} {user.last_name}".strip()}, status=status.HTTP_201_CREATED)
                 else:
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             except Exception as e:

@@ -12,6 +12,7 @@ from .email import send_templated_email  # Assuming you have a utility function 
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken,BlacklistedToken
 from django.utils import timezone
+from django.db import IntegrityError
 
 User = get_user_model() # Get your CustomUser model
 
@@ -60,19 +61,30 @@ class SignUpSerializers(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         # Explicitly list the fields a user can provide during signup
-        fields = ('first_name','last_name', 'email', 'user_name', 'password', 'password2', 'role')
+        fields = ('first_name','last_name', 'email', 'password', 'password2', 'role')
         # Any fields that should not be set by the user during creation
         read_only_fields = ( 'is_staff', 'is_superuser', 'is_active', 'start_date', 'last_login')
 
+
+    def validate_email(self, value):
+        """
+        Check if email already exists in the database
+        """
+        if CustomUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError("A user with this email address already exists.")
+        return value
 
     def validate(self, data):
         # 1. Validate password match
         if data['password'] != data['password2']:
             raise serializers.ValidationError({"password2": "Passwords must match."})
 
+        # 2. Double-check if email already exists (redundant but safer)
+        if CustomUser.objects.filter(email=data['email']).exists():
+            raise serializers.ValidationError({"email": "A user with this email address already exists."})
+
         # Optional: Add password complexity validation if not handled by Django's auth validators
         # You might need to import 'password_validation' from django.contrib.auth
-        # from django.contrib.auth import password_validation
         # try:
         #     password_validation.validate_password(data['password'], user=CustomUser())
         # except ValidationError as e:
@@ -90,7 +102,7 @@ class SignUpSerializers(serializers.ModelSerializer):
             # on your CustomUser model's manager, as it handles password hashing.
             user = CustomUser.objects.create_user(
                 email=validated_data['email'],
-                firts_name=validated_data['firstname_name'],
+                first_name=validated_data.get('first_name', ''),
                 password=password, # Pass the plain text password here for hashing
                 last_name=validated_data.get('last_name', ''), # Use .get() with default for optional fields
                 role=validated_data.get('role', ''),
@@ -101,28 +113,34 @@ class SignUpSerializers(serializers.ModelSerializer):
             # user.role = 'regular_user'
             # user.save() # Save again if you changed fields after create_user
 
+        except IntegrityError as e:
+            # Handle specific database constraint violations
+            if 'unique constraint' in str(e).lower() and 'email' in str(e).lower():
+                raise serializers.ValidationError({"email": "A user with this email address already exists."})
+            else:
+                raise serializers.ValidationError({"detail": f"Could not create user: Database constraint violation"})
         except Exception as e:
-            # Catch potential database errors (e.g., duplicate unique fields like email or user_name)
-            raise serializers.ValidationError({"detail": f"Could not create user: {e}"})
+            # Catch other potential errors
+            raise serializers.ValidationError({"detail": f"Could not create user: {str(e)}"})
 
-        # --- Prepare and send Welcome Email using the unified function ---
-        subject = f"Welcome to {settings.SITE_NAME}!"
-        recipient_list = [user.email]
-        context = {
-            'user': user,
-            'site_name': settings.SITE_NAME,
-            #'site_domain': settings.SITE_DOMAIN,
-            'role': user.role,
-        }
+        # # --- Prepare and send Welcome Email using the unified function ---
+        # subject = f"Welcome to {settings.SITE_NAME}!"
+        # recipient_list = [user.email]
+        # context = {
+        #     'user': user,
+        #     'site_name': settings.SITE_NAME,
+        #     #'site_domain': settings.SITE_DOMAIN,
+        #     'role': user.role,
+        # }
 
         # Option 1: Synchronous call
-        send_templated_email(
-            subject,
-            'emails/welcome_email.txt',
-            'emails/welcome_email.html',
-            recipient_list,
-            context
-        )
+        # send_templated_email(
+        #     subject,
+        #     'emails/welcome_email.txt',
+        #     'emails/welcome_email.html',
+        #     recipient_list,
+        #     context
+        # )
 
         # Option 2: Asynchronous call (if send_templated_email_async is defined in email_utils.py)
         # send_templated_email_async.delay(
