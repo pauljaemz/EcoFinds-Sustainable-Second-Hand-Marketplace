@@ -20,7 +20,6 @@ export default function Profile() {
     <div className="container">
       <h2>Profile</h2>
       <p><strong>Email:</strong> {user.email}</p>
-      <p><strong>Role:</strong> {user.role}</p>
       <input value={name} onChange={e => setName(e.target.value)} />
       <button style={{ background: "#0070f3", color: "white" }} onClick={handleUpdate}>Update Name</button>
     </div>
