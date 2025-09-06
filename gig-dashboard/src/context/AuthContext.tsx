@@ -4,13 +4,12 @@ export type User = {
   id: number;
   name: string;
   email: string;
-  role: "buyer" | "seller";
 };
 
 type AuthContextType = {
   user: User | null;
   login: (email: string, password: string) => void;
-  signup: (name: string, email: string, password: string, role: "buyer" | "seller") => void;
+  signup: (name: string, email: string, password: string) => void;
   logout: () => void;
   updateProfile: (updates: Partial<Pick<User, "name">>) => void;
 };
@@ -27,10 +26,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("currentUser", JSON.stringify(storedUser));
   };
 
-  const signup = (name: string, email: string, password: string, role: "buyer" | "seller") => {
+  const signup = (name: string, email: string, password: string) => {
     const users = JSON.parse(localStorage.getItem("users") || "[]");
     if (users.find((u: any) => u.email === email)) throw new Error("Email already exists");
-    const newUser = { id: Date.now(), name, email, role };
+    const newUser = { id: Date.now(), name, email };
     users.push(newUser);
     localStorage.setItem("users", JSON.stringify(users));
     setUser(newUser);
@@ -47,7 +46,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const updatedUser = { ...user, ...updates };
     setUser(updatedUser);
 
-    // Update localStorage users array
     const users = JSON.parse(localStorage.getItem("users") || "[]");
     const updatedUsers = users.map((u: any) => (u.id === user.id ? updatedUser : u));
     localStorage.setItem("users", JSON.stringify(updatedUsers));
@@ -55,8 +53,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   React.useEffect(() => {
-    const savedUser = localStorage.getItem("currentUser");
-    if (savedUser) setUser(JSON.parse(savedUser));
+    // Clean up stored users and currentUser (remove any role)
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const cleanedUsers = users.map((u: any) => {
+      const { role, ...rest } = u;
+      return rest;
+    });
+    localStorage.setItem("users", JSON.stringify(cleanedUsers));
+
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+    if (currentUser) {
+      const { role, ...rest } = currentUser;
+      localStorage.setItem("currentUser", JSON.stringify(rest));
+      setUser(rest);
+    }
   }, []);
 
   return (
