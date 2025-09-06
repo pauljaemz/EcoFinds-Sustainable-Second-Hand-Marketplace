@@ -40,8 +40,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     This model can be extended with additional fields as needed.
     """
     class user_roles(models.TextChoices):
-        BUYER = 'buyer', _('Buyer')
-        SELLER = 'seller', _('Seller')
+        USER = 'user', _('User')
         ADMIN = 'admin', _('Admin')
     
     first_name = models.CharField(_('first_name'),max_length=150)

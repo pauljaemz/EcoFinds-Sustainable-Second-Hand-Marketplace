@@ -181,7 +181,7 @@ class SellerRegisterViews(APIView):
             data = request.data.copy()
                 # Set a default for role if not provided
             if not data.get('role'):
-                data['role'] = 'student'          
+                data['role'] = 'user'          
             try:
                 serializer = s.SignUpSerializers(data=data)
                 if serializer.is_valid():
@@ -201,7 +201,7 @@ class BuyerRegisterViews(APIView):
             data = request.data.copy()
             # Set a default for role if not provided
             if not data.get('role'):
-                data['role'] = 'business'          
+                data['role'] = 'user'          
             try:
                 serializer = s.SignUpSerializers(data=data)
                 if serializer.is_valid():
