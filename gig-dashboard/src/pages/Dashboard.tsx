@@ -1,32 +1,30 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
+  const { user } = useAuth();
   if (!user) return <div className="container">Please log in.</div>;
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
   return (
-    <div className="container center">
+    <div className="container center" style={{ textAlign: "center", marginTop: 40 }}>
       <h2>Welcome, {user.name}!</h2>
-      <div className="dashboard-links" style={{ display: "flex", gap: "12px", marginTop: "20px", flexWrap: "wrap" }}>
+      <div className="dashboard-links" style={{ display: "flex", justifyContent: "center", gap: 16, marginTop: 20 }}>
         <Link to="/profile">
-          <button style={{ background: "#0070f3", color: "white", padding: "8px 16px", border: "none", borderRadius: "4px" }}>Profile</button>
-        </Link>
-        <Link to="/listings">
-          <button style={{ background: "#1abc9c", color: "white", padding: "8px 16px", border: "none", borderRadius: "4px" }}>Listings</button>
+          <button style={{ background: "#0070f3", color: "white", padding: "10px 20px", border: "none", borderRadius: 6 }}>
+            Profile
+          </button>
         </Link>
         <Link to="/new-listing">
-          <button style={{ background: "#f39c12", color: "white", padding: "8px 16px", border: "none", borderRadius: "4px" }}>New Listing</button>
+          <button style={{ background: "#1abc9c", color: "white", padding: "10px 20px", border: "none", borderRadius: 6 }}>
+            Post Product
+          </button>
         </Link>
-        <button onClick={handleLogout} style={{ background: "#e74c3c", color: "white", padding: "8px 16px", border: "none", borderRadius: "4px" }}>Logout</button>
+        <Link to="/my-listings">
+          <button style={{ background: "#3498db", color: "white", padding: "10px 20px", border: "none", borderRadius: 6 }}>
+            View Listings
+          </button>
+        </Link>
       </div>
     </div>
   );
