@@ -24,10 +24,19 @@ class CustomUserAdminConfig(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('first_name', 'last_name', 'email', 'password1', 'password2')}
+            'fields': ('first_name', 'last_name', 'email', 'password1', 'password2','is_staff',)}
         ),
     )
     readonly_fields = ('last_login', 'date_joined','role','is_superuser','password_last_changed',)
+
+    def save_model(self, request, obj, form, change):
+        """
+        Set the default role to 'user' for new user creations.
+        The 'change' parameter is False if a new object is being created.
+        """
+        if not change:
+            obj.role = 'user'
+        super().save_model(request, obj, form, change)
 
 # Register your models here.
 admin.site.register(CustomUser, CustomUserAdminConfig)
