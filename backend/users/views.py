@@ -174,32 +174,12 @@ class CustomTokenVerifyView(TokenVerifyView):
         except Exception as e:
             return Response({'detail': f"An error occurred during token verification: {e}"}, status=status.HTTP_400_BAD_REQUEST)
 
-class SellerRegisterViews(APIView):
+class UserRegisterViews(APIView):
     permission_classes = [permissions.AllowAny]
     def post(self,request):
         try:
             data = request.data.copy()
                 # Set a default for role if not provided
-            if not data.get('role'):
-                data['role'] = 'user'          
-            try:
-                serializer = s.SignUpSerializers(data=data)
-                if serializer.is_valid():
-                    user = serializer.save()
-                    return Response({'message': 'User created successfully', 'Name': user.name}, status=status.HTTP_201_CREATED)
-                else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)    
-        except Exception as e:
-            return Response({'error': 'Something went wrong when trying to register your account'+"\n"+str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-class BuyerRegisterViews(APIView):
-    permission_classes = [permissions.AllowAny]
-    def post(self,request):
-        try:
-            data = request.data.copy()
-            # Set a default for role if not provided
             if not data.get('role'):
                 data['role'] = 'user'          
             try:

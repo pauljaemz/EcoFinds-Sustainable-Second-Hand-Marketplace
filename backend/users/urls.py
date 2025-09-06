@@ -5,8 +5,7 @@ from . import views as Login_View
 # with base url localhost:8000/account/ or (http://127.0.0.1:8000/account/)
 
 urlpatterns = [
-    path('register/seller', Login_View.SellerRegisterViews.as_view(), name='register-seller'),
-    path('register/buyer', Login_View.BuyerRegisterViews.as_view(), name='register-buyer'),
+    path('register/user', Login_View.UserRegisterViews.as_view(), name='register-user'),
     path('load_users/', Login_View.LoadUserView.as_view(), name='loadusers'),
     path('logout/', Login_View.LogoutView.as_view(), name='logout'),
     path('token/', Login_View.CustomTokenObtainPairView.as_view(), name='TokenObtainPair'),
