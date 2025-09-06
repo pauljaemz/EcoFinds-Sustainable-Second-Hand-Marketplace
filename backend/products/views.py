@@ -2,7 +2,6 @@ from django.shortcuts import render
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied
 from .models import Product
 from .serializers import ProductSerializer
 
@@ -17,10 +16,8 @@ class ProductViewSet(viewsets.ModelViewSet):
         return [permissions.AllowAny()]
 
     def perform_create(self, serializer):
-        user = self.request.user
-        if getattr(user, "role", None) != "seller":
-            raise PermissionDenied("Only sellers can create products.")
-        serializer.save(seller=user)
+        # No role check, any authenticated user can create products
+        serializer.save(seller=self.request.user)
 
     @action(
         detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated]
