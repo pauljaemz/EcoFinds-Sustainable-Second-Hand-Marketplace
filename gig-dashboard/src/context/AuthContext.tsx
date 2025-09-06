@@ -53,20 +53,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   React.useEffect(() => {
-    // Clean up stored users and currentUser (remove any role)
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const cleanedUsers = users.map((u: any) => {
-      const { role, ...rest } = u;
-      return rest;
-    });
-    localStorage.setItem("users", JSON.stringify(cleanedUsers));
-
-    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
-    if (currentUser) {
-      const { role, ...rest } = currentUser;
-      localStorage.setItem("currentUser", JSON.stringify(rest));
-      setUser(rest);
-    }
+    const savedUser = localStorage.getItem("currentUser");
+    if (savedUser) setUser(JSON.parse(savedUser));
   }, []);
 
   return (

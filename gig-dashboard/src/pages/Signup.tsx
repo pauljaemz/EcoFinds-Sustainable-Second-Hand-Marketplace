@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
   const { signup } = useAuth();
-  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,7 +12,6 @@ export default function Signup() {
     e.preventDefault();
     try {
       signup(name, email, password);
-      navigate("/dashboard");
     } catch (err: any) {
       setError(err.message);
     }
