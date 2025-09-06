@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useProducts, ProductForm } from "../context/ProductContext";
 import { useAuth } from "../context/AuthContext";
 import ProductDetail from "./ProductDetail";
@@ -6,10 +6,21 @@ import ProductDetail from "./ProductDetail";
 export default function MyListings() {
   const { user } = useAuth();
   const { products, addProduct, deleteProduct } = useProducts();
-  const myProducts = user?.role === "seller" ? products.filter(p => p.sellerId === user.id) : products;
+
+  const myProducts = user?.role === "seller"
+    ? products.filter(p => p.sellerId === user.id)
+    : products;
 
   const [selected, setSelected] = useState<number | null>(null);
   const [form, setForm] = useState<ProductForm>({ title: "", description: "", category: "", price: 0, image: "" });
+  const [search, setSearch] = useState("");
+  const [filterCategory, setFilterCategory] = useState<string>("All");
+
+  // Extract unique categories
+  const categories = useMemo(() => {
+    const cats = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
+    return ["All", ...cats];
+  }, [products]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -25,8 +36,17 @@ export default function MyListings() {
     }
   };
 
+  // Filter products dynamically
+  const displayedProducts = useMemo(() => {
+    return myProducts.filter(p =>
+      p.title.toLowerCase().includes(search.toLowerCase()) &&
+      (filterCategory === "All" || p.category === filterCategory)
+    );
+  }, [myProducts, search, filterCategory]);
+
   return (
     <div className="container">
+      {/* Seller: Add Product Form */}
       {user?.role === "seller" && (
         <div className="card">
           <h3>Add New Product</h3>
@@ -39,8 +59,35 @@ export default function MyListings() {
         </div>
       )}
 
+      {/* Buyer: Search + Filter */}
+      {user?.role === "buyer" && (
+        <div className="card center">
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
+            {categories.map(cat => (
+              <button
+                key={cat}
+                style={{
+                  background: filterCategory === cat ? "#0070f3" : "#ccc",
+                  color: filterCategory === cat ? "white" : "#333"
+                }}
+                onClick={() => setFilterCategory(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Product Grid */}
       <div className="products-grid">
-        {myProducts.map(p => (
+        {displayedProducts.map(p => (
           <div key={p.id} className="card product-card">
             {p.image && <img src={p.image} alt={p.title} />}
             <h4>{p.title}</h4>
