@@ -1,4 +1,14 @@
+# Demo Video
+https://drive.google.com/file/d/1zT4UB8LNMSytp8vwNJLTmyxGZoRXQRZV/view?usp=sharing
+
+---
+
 # EcoFinds Platform
+
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/postgresql-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 
 EcoFinds is a web application designed to connect buyers and sellers in a marketplace focused on products. The platform allows users to create accounts, manage their profiles, list products, and make purchases seamlessly.
 
